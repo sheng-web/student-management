@@ -1,58 +1,10 @@
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.*;
-
-public class BatchRequestTask {
-
-    private static final int BATCH_SIZE = 1000;
-    private List<Data> dataList; // 假设这是你的6万条数据
-
-    public BatchRequestTask(List<Data> dataList) {
-        this.dataList = dataList;
+Map<String, StaffGitDetail> staffGitDetailMapForDate = staffGitDetailMap.getOrDefault(pullRequestDate, new HashMap<>());
+    if (staffGitDetailMapForDate.containsKey(staffId)) {
+        staffGitDetailMapForDate.get(staffId).setPullRequestCount((long) pullRequestDetail[2]);
+    } else {
+        log.info("staffGitDetailMap.get({}) is: {}", pullRequestDate, staffGitDetailMapForDate);
+        staffGitDetailMapForDate.put(staffId, staffGitDetail1);
+        log.info("staffGitDetailMap.get({}) is: {}", pullRequestDate, staffGitDetailMapForDate);
     }
 
-    public void sendRequests() throws InterruptedException, ExecutionException {
-        ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors()); // 根据CPU核心数创建线程池
-
-        List<Future<Void>> futures = new ArrayList<>();
-        for (int i = 0; i < dataList.size(); i += BATCH_SIZE) {
-            int endIndex = Math.min(i + BATCH_SIZE, dataList.size());
-            List<Data> batchData = dataList.subList(i, endIndex);
-            futures.add(executor.submit(new RequestTask(batchData)));
-        }
-
-        // 等待所有任务完成
-        for (Future<Void> future : futures) {
-            future.get();
-        }
-
-        // 关闭线程池
-        executor.shutdown();
-    }
-
-    private static class RequestTask implements Callable<Void> {
-        private List<Data> data;
-
-        public RequestTask(List<Data> data) {
-            this.data = data;
-        }
-
-        @Override
-        public Void call() {
-            // 在这里实现发送请求的逻辑，例如：
-            sendRequest(data);
-            return null;
-        }
-
-        private void sendRequest(List<Data> data) {
-            // 发送这1000个数据的请求...
-            System.out.println("Sending request for " + data.size() + " pieces of data...");
-            // 实际代码中请替换为你的实际请求逻辑
-        }
-    }
-
-    // 假设的数据类
-    private static class Data {
-        // 数据字段...
-    }
-}
+    staffGitDetailMap.put(pullRequestDate, staffGitDetailMapForDate);
