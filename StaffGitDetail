@@ -1,0 +1,80 @@
+如果我有一个 list，里面是 StaffGitDetail 的对象，StaffGitDetail 有属性：staffId，actionDate,commitCount,additionCount,deletionCount,pullRequestCount,totalCount.现在需要把这个 list 转化成下面格式的 json：
+[
+{
+"actionDate":"2023-01-01",
+"staffGitDetails":[
+{
+"staffId":"45191137",
+"commitCount":2,
+"addtionCount":4,
+"deletionCount":1,
+"pullRequestCount":0,
+"totalCount":5
+},
+{
+"staffId":"45191137",
+"commitCount":2,
+"addtionCount":4,
+"deletionCount":1,
+"pullRequestCount":0,
+"totalCount":5
+},
+]
+}
+]，请给出相对应的 Java 代码
+
+
+在Java中，你可以使用Jackson库或者Gson库将一个`List<StaffGitDetail>`转换成上述格式的JSON字符串。这里以Jackson库为例，假设你已经有了一个名为`staffDetailsList`的`List<StaffGitDetail>`对象，并且你需要为每个`StaffGitDetail`对象创建一个包含actionDate字段的外层结构：
+
+```java
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.ArrayList;
+import java.util.List;
+
+public class StaffGitDetail {
+    private String staffId;
+    private int commitCount;
+    private int additionCount;
+    private int deletionCount;
+    private int pullRequestCount;
+    private int totalCount;
+
+    // 构造函数、getters和setters省略...
+
+}
+
+// 假设这是你的数据
+List<StaffGitDetail> staffDetailsList = new ArrayList<>();
+// ...填充数据...
+
+// 创建中间容器来包裹staffGitDetails
+class ReportData {
+    private String actionDate;
+    private List<StaffGitDetail> staffGitDetails;
+
+    public ReportData(String actionDate, List<StaffGitDetail> details) {
+        this.actionDate = actionDate;
+        this.staffGitDetails = details;
+    }
+
+    // getters and setters...
+}
+
+// 使用示例
+String actionDate = "2023-01-01";
+ReportData report = new ReportData(actionDate, staffDetailsList);
+
+ObjectMapper mapper = new ObjectMapper();
+try {
+    String jsonOutput = mapper.writeValueAsString(report);
+    System.out.println(jsonOutput);
+} catch (JsonProcessingException e) {
+    e.printStackTrace();
+}
+```
+
+上面的代码首先定义了一个`StaffGitDetail`类，并创建了一个包含所需字段的列表。然后，我们定义了一个`ReportData`类，它包含一个actionDate字段以及一个staffGitDetails列表。
+
+最后，我们使用Jackson的`ObjectMapper`将封装了日期和详细信息的`ReportData`对象转换为JSON字符串。
+
+注意：为了使Jackson能够正确序列化`StaffGitDetail`对象，确保为`StaffGitDetail`类的所有字段提供getter和setter方法。如果`actionDate`应该从`StaffGitDetail`集合中的某个属性获取，那么逻辑需要相应调整。上述例子中的`actionDate`是固定值，如果你需要根据`StaffGitDetail`实例计算或获取这个日期，则需要在构造`ReportData`时处理。
